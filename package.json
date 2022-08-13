@@ -1,0 +1,35 @@
+{
+  "name": "abc-scraper",
+  "version": "1.0.0",
+  "description": "Scraper for specific ABC products",
+  "main": "index.js",
+  "scripts": {
+    "install": "echo 'Install Frontend and Backend'",
+    "install:front": "echo 'Install deps for Frontend'",
+    "install:back": "echo 'Install deps for Backend'",
+    "build": "echo 'Build Frontend and Backend'",
+    "build:front": "echo 'Build Frontend'",
+    "build:back": "echo 'Build Backend'",
+    "test": "echo 'Test Frontend and Backend'",
+    "test:front": "",
+    "test:back": ""
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/EthanTPainter/abc-scraper.git"
+  },
+  "keywords": [
+    "JavaScript",
+    "TypeScript",
+    "AWS",
+    "Lambda",
+    "Node",
+    "Bun"
+  ],
+  "author": "EthanTPainter",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/EthanTPainter/abc-scraper/issues"
+  },
+  "homepage": "https://github.com/EthanTPainter/abc-scraper#readme"
+}
