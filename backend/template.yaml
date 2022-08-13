@@ -1,0 +1,86 @@
+AWSTemplateFormatVersion: "2010-09-09"
+Transform: "AWS::Serverless-2016-10-31"
+Description: "Infra for the ABC Scraper"
+
+Parameters:
+  TableName:
+    Type: String
+    Default: ABC-Scraper-Table
+    Description: DynamoDB Table Name
+  TopicName:
+    Type: String
+    Default: ABC-User-SNS
+    Description: SNS for notifiying users for ABC product updates
+
+Resources:
+  NotificationSNS:
+    Type: AWS::SNS::Topic
+    Properties:
+      TopicName: !Ref TopicName
+      Tags:
+        - Key: Product
+          Value: ABC-Scraper
+
+  DynamoTable:
+    Type: AWS::DynamoDB::Table
+    Properties:
+      TableName: !Ref TableName
+      AttributeDefinitions:
+        - AttributeName: Username
+          AttributeType: S
+        - AttributeName: ProductName
+          AttributeType: S
+      KeySchema:
+        - AttributeName: Username
+          KeyType: HASH
+        - AttributeName: ProductName
+          KeyType: RANGE
+      BillingMode: PROVISIONED
+      SSESpecification:
+        SSEEnabled: false
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      Tags:
+        - Key: Product
+          Value: ABC-Scraper
+
+  ScraperLambda:
+    DependsOn:
+      - DynamoTable
+      - NotificationSNS
+    Type: AWS::Serverless::Function
+    Properties:
+      FunctionName: ABC-Scraper-Lambda
+      Timeout: 600
+      MemorySize: 128
+      # Architectures may not be supported in SAM templates
+      # Architectures: arm64
+      Runtime: provided
+      Handler: src/index.handler
+      Tags:
+        Product: ABC-Scraper
+      Policies:
+        Statement:
+          - Effect: Allow
+            Action:
+              - dynamodb:GetItem
+              - dynamodb:GetRecords
+              - dynamodb:Query
+              - dynamodb:PartiQLInsert
+              - dynamodb:PartiQLUpdate
+              - dynamodb:UpdateItem
+              - dynamodb:DeleteItem
+              - dynamodb:PutItem
+            Resource:
+              - !GetAtt DynamoTable.Arn
+          - Effect: Allow
+            Action:
+              - sns:Publish
+            Resource:
+              - !Ref NotificationSNS
+
+Outputs:
+  ScraperLambdaArn:
+    Description: Arn for the ABC Scraper Lambda
+    Value: !GetAtt ScraperLambda.Arn
