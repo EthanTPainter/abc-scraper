@@ -31,5 +31,8 @@
   "bugs": {
     "url": "https://github.com/EthanTPainter/abc-scraper/issues"
   },
-  "homepage": "https://github.com/EthanTPainter/abc-scraper#readme"
+  "homepage": "https://github.com/EthanTPainter/abc-scraper#readme",
+  "devDependencies": {
+    "@types/node": "^18.7.2"
+  }
 }

@@ -96,3 +96,6 @@ nginx.conf
 .params-*
 *.aws-sam
 *.toml
+
+# Bun (Still testing this)
+bun.lockb
