@@ -47,7 +47,6 @@ export const getProductPage = async (productType: string, productName: string, p
   }
 
   // Check inventory amount
-  console.log(`INVENTORY AMOUNT???`);
   await page.$eval("td[data-title='Inventory']", el => console.log(el));
   await delay(1000);
 };
@@ -56,12 +55,11 @@ export const closeBrowser = async () => {
   ;await browser.close();
 }
 
-const test = async () => {
-  console.log("HELLO");
-  await loadBaseUrl();
-  await setStoreLocation();
-  await getProductPage("bourbon", "buffalo-trace-bourbon", "750");
-  await closeBrowser();
-};
-
-test();
+// const test = async () => {
+//   console.log("HELLO");
+//   await loadBaseUrl();
+//   await setStoreLocation();
+//   await getProductPage("bourbon", "buffalo-trace-bourbon", "750");
+//   await closeBrowser();
+// };
+// test()
