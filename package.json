@@ -23,8 +23,7 @@
     "TypeScript",
     "AWS",
     "Lambda",
-    "Node",
-    "Bun"
+    "Node"
   ],
   "author": "EthanTPainter",
   "license": "MIT",
