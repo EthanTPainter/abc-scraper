@@ -14,7 +14,5 @@ export const getProductRecords = async (username: string) => {
   };
 
   const productRecords = await dynamoClient.query(parameters).promise();
-  console.log(`PRODUCT COUNT: `, productRecords.Count);
-  console.log(`PRODUCT ITEMS:`, productRecords.Items);
   return productRecords.Items ?? [];
 };
