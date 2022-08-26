@@ -53,10 +53,11 @@ Resources:
     Properties:
       FunctionName: ABC-Scraper-Lambda
       Timeout: 600
-      MemorySize: 128
-      # Architectures may not be supported in SAM templates
-      # Architectures: arm64
-      Runtime: provided
+      MemorySize: 256
+      Architectures:
+        - arm64
+      Runtime: nodejs16.x
+      CodeUri: ./dist
       Handler: src/index.handler
       Tags:
         Product: ABC-Scraper
