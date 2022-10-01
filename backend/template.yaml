@@ -11,6 +11,9 @@ Parameters:
     Type: String
     Default: ABC-User-SNS
     Description: SNS for notifiying users for ABC product updates
+  ImageUriParameter:
+    Type: String
+    Description: Image URI for the dockerfile
 
 Resources:
   NotificationSNS:
@@ -52,13 +55,13 @@ Resources:
     Type: AWS::Serverless::Function
     Properties:
       FunctionName: ABC-Scraper-Lambda
+      Description: Scheduled scraper lambda for VA ABC products
+      PackageType: Image
+      ImageUri: !Ref ImageUriParameter
       Timeout: 600
-      MemorySize: 256
+      MemorySize: 1024
       Architectures:
-        - arm64
-      Runtime: nodejs16.x
-      CodeUri: ./dist
-      Handler: src/index.handler
+        - x86_64
       Tags:
         Product: ABC-Scraper
       Policies:
