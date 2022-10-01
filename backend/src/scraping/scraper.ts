@@ -1,9 +1,10 @@
-import puppeteer from "puppeteer";
+import chromium from "chrome-aws-lambda";
+const puppeteer = chromium.puppeteer;
 
 const baseUrl = "https://www.abc.virginia.gov";
 
-let browser: puppeteer.Browser;
-let page: puppeteer.Page;
+let browser: any; // type ofPpuppeteer.Browser
+let page: any; // puppeteer.Page;
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -11,12 +12,18 @@ const DEFAULT_MY_STORE =
   "148 Charter Colony Parkway Midlothian, VA 23114 (#248)";
 const NO_INVENTORY_TEXT = "In-store purchase only";
 const INVENTORY_TABLE_ID = "no-more-tables";
-const FIND_AT_OTHER_STORES_BUTTON_TEXT = "Find at Other stores";
 
 export const loadBaseUrl = async () => {
-  browser = await puppeteer.launch({ headless: false });
+  browser = await puppeteer.launch({
+    defaultViewport: chromium.defaultViewport,
+    headless: true,
+    executablePath: await chromium.executablePath,
+    args: chromium.args,
+  });
   page = await browser.newPage();
-  await page.goto(baseUrl);
+  await page.goto(baseUrl, {
+    waitUntil: ["domcontentloaded"],
+  });
 };
 
 export const setStoreLocation = async () => {
@@ -50,7 +57,9 @@ export const getProductInventory = async (
 ) => {
   const productUrl = `${baseUrl}/products/${productType}/${productName}`;
   console.log("Product URL: ", productUrl);
-  await page.goto(productUrl);
+  await page.goto(productUrl, {
+    waitUntil: ["domcontentloaded"],
+  });
   await delay(5000);
 
   // Select product size
@@ -67,7 +76,7 @@ export const getProductInventory = async (
   }
 
   // Get first div text to check for no inventory text
-  const firstDivText = await inventory.$eval("div", (el) => el.innerHTML);
+  const firstDivText = await inventory.$eval("div", (el: HTMLDivElement) => el.innerHTML);
   if (firstDivText.includes(NO_INVENTORY_TEXT)) {
     console.log(
       `No Inventory found for ${productType} with name ${productName} (with size ${productSize})`
@@ -79,29 +88,32 @@ export const getProductInventory = async (
 };
 
 export const parseInventoryTable = async (
-  inventory: puppeteer.ElementHandle<Element>
+  inventory: any // type of puppeteer.ElementHandle<Element>
 ) => {
   // Get first div id to validate inventory table is present
   // If it is, Check inventory of the home store
-  const firstDivId = await inventory.$eval("div", (el) => el.id);
-  if (firstDivId !== INVENTORY_TABLE_ID) return;
+  const firstDivId = await inventory.$eval("div", (el: HTMLDivElement) => el.id);
+  if (firstDivId !== INVENTORY_TABLE_ID) return [];
 
   const table = await inventory.$("table");
-  if (!table) return;
+  if (!table) {
+    console.log(`Could not find a table element within the inventory`);
+    return [];
+  }
 
-  const tableHeaders = await table.$$eval("thead > tr > th", (nodes) =>
-    nodes.map((node) => node.innerHTML)
+  const tableHeaders = await table.$$eval("thead > tr > th", (nodes: Element[]) =>
+    nodes.map((node: Element) => node.innerHTML)
   );
   const headerIndex = tableHeaders.indexOf("Inventory");
   if (!headerIndex) {
     console.log(
       `Did not find Inventory column in the table headers: ${tableHeaders}`
     );
-    return;
+    return [];
   }
   const myStoreInventory = await table.$eval(
     `tbody > tr > td:nth-child(${headerIndex + 1})`,
-    (el) => el.innerHTML
+    (el: Element) => el.innerHTML
   );
   if (myStoreInventory !== "0") {
     return [
@@ -117,7 +129,10 @@ export const parseInventoryTable = async (
   const findAtOtherStoresButton = await inventory.$(
     `a[class='more-stores'] > div`
   );
-  if (!findAtOtherStoresButton) return;
+  if (!findAtOtherStoresButton) {
+    console.log(`Did not find the find other stores button`); 
+    return [];
+  }
   await findAtOtherStoresButton.click();
   await delay(200);
 
@@ -125,7 +140,7 @@ export const parseInventoryTable = async (
   const nearbyStores = await table.$$("tbody > tr");
   // If only myStore is still shown (no other stores shown), return
   if (nearbyStores.length === 1) {
-    return;
+    return [];
   }
   const otherStores = nearbyStores.slice(1);
   const storesWithInventory = [];
@@ -134,12 +149,12 @@ export const parseInventoryTable = async (
     // FIRST = LOCATION
     const address = await storeSections[0].$eval(
       "div > a",
-      (el) => el.innerHTML
+      (el: Element) => el.innerHTML
     );
     // SECOND = MILES
-    const miles = await storeSections[1].evaluate((el) => el.innerHTML);
+    const miles = await storeSections[1].evaluate((el: HTMLTableCellElement) => el.innerHTML);
     // THIRD = INVENTORY
-    const inventory = await storeSections[2].evaluate((el) => el.innerHTML);
+    const inventory = await storeSections[2].evaluate((el: HTMLTableCellElement) => el.innerHTML);
 
     if (parseInt(inventory) > 0) {
       storesWithInventory.push({
