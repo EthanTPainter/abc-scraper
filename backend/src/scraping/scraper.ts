@@ -5,7 +5,13 @@ const baseUrl = "https://www.abc.virginia.gov";
 let browser: puppeteer.Browser;
 let page: puppeteer.Page;
 
-const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
+
+const DEFAULT_MY_STORE =
+  "148 Charter Colony Parkway Midlothian, VA 23114 (#248)";
+const NO_INVENTORY_TEXT = "In-store purchase only";
+const INVENTORY_TABLE_ID = "no-more-tables";
+const FIND_AT_OTHER_STORES_BUTTON_TEXT = "Find at Other stores";
 
 export const loadBaseUrl = async () => {
   browser = await puppeteer.launch({ headless: false });
