@@ -11,8 +11,8 @@
     "build:front": "echo 'Build Frontend'",
     "build:back": "echo 'Build Backend'",
     "test": "echo 'Test Frontend and Backend'",
-    "test:front": "",
-    "test:back": ""
+    "test:front": "echo 'Test Frontend'",
+    "test:back": "echo 'Test Backend'"
   },
   "repository": {
     "type": "git",
