@@ -40,8 +40,7 @@ To run: `./shell-scripts/aws_run.sh`
 
 First, install AWS SAM CLI.
 
-Then within the backend folder, run the following:
-`sam deploy cloudformation --stack-name ABC-Scraper-Stack -t template.yaml`
+Then within the backend folder, use the script `./shell-scripts/deploy_to_aws.sh`. This will handle the ECR deploy for the generated docker image, the scraper lambda, and all other resources (dynamoDB, SNS, etc.).
 
 ### Local Debugging
 
