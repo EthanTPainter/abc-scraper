@@ -1,6 +1,5 @@
-import { DynamoDB } from "aws-sdk";
-
-const dynamoClient = new DynamoDB.DocumentClient({ apiVersion: "2012-08-10" });
+import { dynamoDBDocClient } from "./lib/dynamoDBDocumentClient";
+import { GetCommand } from "@aws-sdk/lib-dynamodb";
 
 const dynamoTableName = "ABC-Scraper-Table";
 
@@ -23,6 +22,6 @@ export const getUserRecord = async (username: string) => {
       ProductName: "null"
     }
   };
-  const record = await dynamoClient.get(parameters).promise();
+  const record = await dynamoDBDocClient.send(new GetCommand(parameters));
   return record.Item as UserRecord ?? null;
 };

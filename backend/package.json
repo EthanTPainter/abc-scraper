@@ -4,14 +4,14 @@
   "description": "Backend for the ABC Scraper",
   "main": "index.ts",
   "scripts": {
-    "build": "tsc && cp -r ./node_modules ./dist",
+    "build": "tsc",
     "clean": "rm -rf ./node_modules"
   },
   "author": "EthanTPainter",
   "license": "MIT",
   "dependencies": {
-    "aws-sdk": "^2.1203.0",
-    "puppeteer": "^16.2.0"
+    "@aws-sdk/client-dynamodb": "^3.181.0",
+    "@aws-sdk/lib-dynamodb": "^3.181.0"
   },
   "devDependencies": {
     "@types/aws-lambda": "^8.10.102",
