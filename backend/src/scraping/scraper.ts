@@ -59,20 +59,117 @@ export const getProductInventory = async (
     await delay(1000);
   }
 
-  // Check inventory amount
-  await page.$eval("td[data-title='Inventory']", el => console.log(el));
-  await delay(1000);
+  // Check inventory amount for home store
+  const inventory = await page.$("product-inventory");
+  if (!inventory) {
+    console.log(`Inventory not found. HUH?`);
+    return;
+  }
+
+  // Get first div text to check for no inventory text
+  const firstDivText = await inventory.$eval("div", (el) => el.innerHTML);
+  if (firstDivText.includes(NO_INVENTORY_TEXT)) {
+    console.log(
+      `No Inventory found for ${productType} with name ${productName} (with size ${productSize})`
+    );
+    return;
+  }
+
+  return inventory;
+};
+
+export const parseInventoryTable = async (
+  inventory: puppeteer.ElementHandle<Element>
+) => {
+  // Get first div id to validate inventory table is present
+  // If it is, Check inventory of the home store
+  const firstDivId = await inventory.$eval("div", (el) => el.id);
+  if (firstDivId !== INVENTORY_TABLE_ID) return;
+
+  const table = await inventory.$("table");
+  if (!table) return;
+
+  const tableHeaders = await table.$$eval("thead > tr > th", (nodes) =>
+    nodes.map((node) => node.innerHTML)
+  );
+  const headerIndex = tableHeaders.indexOf("Inventory");
+  if (!headerIndex) {
+    console.log(
+      `Did not find Inventory column in the table headers: ${tableHeaders}`
+    );
+    return;
+  }
+  const myStoreInventory = await table.$eval(
+    `tbody > tr > td:nth-child(${headerIndex + 1})`,
+    (el) => el.innerHTML
+  );
+  if (myStoreInventory !== "0") {
+    return [
+      {
+        inventory: parseInt(myStoreInventory),
+        miles: 0,
+        address: DEFAULT_MY_STORE,
+      },
+    ];
+  }
+
+  // If not found, look for other stores button (if available)
+  const findAtOtherStoresButton = await inventory.$(
+    `a[class='more-stores'] > div`
+  );
+  if (!findAtOtherStoresButton) return;
+  await findAtOtherStoresButton.click();
+  await delay(200);
+
+  // Get new list of stores
+  const nearbyStores = await table.$$("tbody > tr");
+  // If only myStore is still shown (no other stores shown), return
+  if (nearbyStores.length === 1) {
+    return;
+  }
+  const otherStores = nearbyStores.slice(1);
+  const storesWithInventory = [];
+  for (const store of otherStores) {
+    const storeSections = await store.$$("td");
+    // FIRST = LOCATION
+    const address = await storeSections[0].$eval(
+      "div > a",
+      (el) => el.innerHTML
+    );
+    console.log(`FIRST SECTION DETAILS: `, address);
+    // SECOND = MILES
+    const miles = await storeSections[1].evaluate((el) => el.innerHTML);
+    console.log("SECOND SECTION: ", parseFloat(miles));
+    // THIRD = INVENTORY
+    const inventory = await storeSections[2].evaluate((el) => el.innerHTML);
+    console.log("THIRD SECTION: ", parseInt(inventory));
+    storesWithInventory.push({
+      address,
+      miles: parseFloat(miles),
+      inventory: parseInt(inventory),
+    });
+  }
+
+  return storesWithInventory;
 };
 
 export const closeBrowser = async () => {
-  ;await browser.close();
-}
+  await browser.close();
+};
 
-// const test = async () => {
-//   console.log("HELLO");
-//   await loadBaseUrl();
-//   await setStoreLocation();
-//   await getProductPage("bourbon", "buffalo-trace-bourbon", "750");
-//   await closeBrowser();
-// };
-// test()
+const test = async () => {
+  console.log("STARTING TEST");
+  await loadBaseUrl();
+  await setStoreLocation();
+  //await getProductInventory("bourbon", "buffalo-trace-bourbon", "750");
+  const table = await getProductInventory(
+    "bourbon",
+    "buffalo-trace-bourbon-cream-liqueur",
+    "750"
+  );
+  if (!table) return;
+
+  const response = await parseInventoryTable(table);
+  await closeBrowser();
+};
+test();
