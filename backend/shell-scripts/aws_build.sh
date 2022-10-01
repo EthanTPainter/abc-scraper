@@ -1,0 +1,1 @@
+docker build -f dockerfiles/aws.dockerfile -t lambda-aws .
