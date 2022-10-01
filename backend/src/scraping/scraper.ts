@@ -136,18 +136,18 @@ export const parseInventoryTable = async (
       "div > a",
       (el) => el.innerHTML
     );
-    console.log(`FIRST SECTION DETAILS: `, address);
     // SECOND = MILES
     const miles = await storeSections[1].evaluate((el) => el.innerHTML);
-    console.log("SECOND SECTION: ", parseFloat(miles));
     // THIRD = INVENTORY
     const inventory = await storeSections[2].evaluate((el) => el.innerHTML);
-    console.log("THIRD SECTION: ", parseInt(inventory));
-    storesWithInventory.push({
-      address,
-      miles: parseFloat(miles),
-      inventory: parseInt(inventory),
-    });
+
+    if (parseInt(inventory) > 0) {
+      storesWithInventory.push({
+        address,
+        miles: parseFloat(miles),
+        inventory: parseInt(inventory),
+      });
+    }
   }
 
   return storesWithInventory;
@@ -156,20 +156,3 @@ export const parseInventoryTable = async (
 export const closeBrowser = async () => {
   await browser.close();
 };
-
-const test = async () => {
-  console.log("STARTING TEST");
-  await loadBaseUrl();
-  await setStoreLocation();
-  //await getProductInventory("bourbon", "buffalo-trace-bourbon", "750");
-  const table = await getProductInventory(
-    "bourbon",
-    "buffalo-trace-bourbon-cream-liqueur",
-    "750"
-  );
-  if (!table) return;
-
-  const response = await parseInventoryTable(table);
-  await closeBrowser();
-};
-test();
