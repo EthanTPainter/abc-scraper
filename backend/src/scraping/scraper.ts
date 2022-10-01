@@ -28,7 +28,10 @@ export const setStoreLocation = async () => {
   await delay(1000);
 
   // Type zip code into store search bar
-  await page.type("input[placeholder='Search by City, Zip, or Store #']", zipCode);
+  await page.type(
+    "input[placeholder='Search by City, Zip, or Store #']",
+    zipCode
+  );
   await delay(1000);
 
   // Click Searh button
@@ -40,7 +43,11 @@ export const setStoreLocation = async () => {
   await delay(500);
 };
 
-export const getProductPage = async (productType: string, productName: string, productSize?: string) => {
+export const getProductInventory = async (
+  productType: string,
+  productName: string,
+  productSize?: string
+) => {
   const productUrl = `${baseUrl}/products/${productType}/${productName}`;
   console.log("Product URL: ", productUrl);
   await page.goto(productUrl);
