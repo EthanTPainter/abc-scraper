@@ -13,6 +13,29 @@ Allows the user to login and view the abc products they are interested in.
 
 Code for creating the infra and maintaining a status check for each user for the available product.
 
+### Running Locally
+
+This repo relies on docker to run locally. You should also download the aws lambda rie binaries from `shell-scripts/download_rie.sh`.
+
+**To build and run the docker image locally**
+
+To build: `./shell-scripts/custom_build.sh`
+
+To run: `./shell-scripts/custom_run.sh`
+
+**Note**: This relies on a local app handler found here `src/local-app`
+
+To test the local image locally: 
+
+`curl -XPOST "http://localhost:9000/2015-03-31/functions/function/invocations" -d '{"url": "https://example.com"}'`
+
+**To build and run the aws docker image**
+
+To build: `./shell-scripts/aws_build.sh`
+
+To run: `./shell-scripts/aws_run.sh`
+
+
 ### Deploying backend
 
 First, install AWS SAM CLI.
