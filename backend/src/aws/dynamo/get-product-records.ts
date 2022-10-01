@@ -1,6 +1,5 @@
-import { DynamoDB } from "aws-sdk";
-
-const dynamoClient = new DynamoDB.DocumentClient({ apiVersion: "2012-08-10" });
+import { dynamoDBDocClient } from "./lib/dynamoDBDocumentClient";
+import { QueryCommand } from "@aws-sdk/lib-dynamodb";
 
 const dynamoTableName = "ABC-Scraper-Table";
 
@@ -13,6 +12,6 @@ export const getProductRecords = async (username: string) => {
     KeyConditionExpression: 'Username = :user',
   };
 
-  const productRecords = await dynamoClient.query(parameters).promise();
+  const productRecords = await dynamoDBDocClient.send(new QueryCommand(parameters));
   return productRecords.Items ?? [];
 };
