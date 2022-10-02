@@ -14,7 +14,8 @@ export const handler = async () => {
   const products = [
     {
       Username: "Les_Product",
-      ProductName: "buffalo-trace-bourbon",
+      ProductName: "buffalo-trace-bourbon-750",
+      ProductUrlName: "buffalo-trace-bourbon",
       ProductType: "bourbon",
       ProductTitle: "Buffalo Trace Bourbon",
       ProductSize: "750",
@@ -24,8 +25,8 @@ export const handler = async () => {
   const allProductInventories = [];
   for (const product of products) {
     const productInventory = await retrieveProductInventory(
-      product.ProductName,
       product.ProductType,
+      product.ProductName,
       product.ProductSize
     );
     if (!productInventory) continue;

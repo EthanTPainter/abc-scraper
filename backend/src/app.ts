@@ -12,8 +12,8 @@ export const handler = async () => {
   const allProductInventories = [];
   for (const product of products) {
     const productInventory = await retrieveProductInventory(
-      product.ProductName,
       product.ProductType,
+      product.ProductUrlName,
       product.ProductSize
     );
     if (!productInventory) continue;

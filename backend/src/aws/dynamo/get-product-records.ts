@@ -6,6 +6,7 @@ const dynamoTableName = "ABC-Scraper-Table";
 type ProductRecord = {
   Username: string,
   ProductName: string;
+  ProductUrlName: string;
   ProductType: string;
   ProductTitle: string;
   ProductSize?: string;
