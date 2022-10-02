@@ -1,9 +1,9 @@
-import { retrieveProductInfo, retrieveProductInventory, retrieveUserInfo } from "./manager";
+import { retrieveProductInfo, retrieveProductInventory } from "./manager";
 import { closeBrowser, loadBaseUrl, setStoreLocation } from "./scraping/scraper";
 
 export const handler = async () => {
-  const userInfo = await retrieveUserInfo("Les");
-  const username = userInfo.Username;
+  const username = process.env.User;
+  if (!username) throw new Error(`Required Environment Variable 'ScraperUsername' was not provided.`);
   const products = await retrieveProductInfo(username);
   console.log(`Products: `, products);
 

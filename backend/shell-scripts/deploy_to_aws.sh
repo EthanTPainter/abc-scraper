@@ -25,6 +25,7 @@ docker push "${IMAGE_URI}"
 STACK_NAME="ABC-Scraper-Stack"
 
 # Deploy with SAM with the Image URI
+SCRAPER_USERNAME="Les"
 sam deploy cloudformation --stack-name ${STACK_NAME} -t template.yaml --region "${REGION}" \
-  --parameter-overrides ImageUriParameter="${IMAGE_URI}" \
+  --parameter-overrides ImageUriParameter="${IMAGE_URI}" ScraperUsername="${SCRAPER_USERNAME}" \
   --image-repository ${IMAGE_URI} --capabilities CAPABILITY_IAM
