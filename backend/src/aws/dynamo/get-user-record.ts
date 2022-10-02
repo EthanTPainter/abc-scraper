@@ -14,7 +14,7 @@ type UserRecord = {
  * @returns Full dynamo record of the provided user
  */
 export const getUserRecord = async (username: string) => {
-  // Hardcoded username for only one user right now
+  // User records should have first name as Username, and "null" as ProductName
   const parameters = {
     TableName: dynamoTableName,
     Key: {
