@@ -26,13 +26,13 @@ export const handler = async () => {
   for (const product of products) {
     const productInventory = await retrieveProductInventory(
       product.ProductType,
-      product.ProductName,
+      product.ProductUrlName,
       product.ProductSize
     );
     if (!productInventory) continue;
 
     const foundInventory = {
-      [product.ProductTitle]: productInventory,
+      [product.ProductTitle]: productInventory
     };
     allProductInventories.push(foundInventory);
   }
