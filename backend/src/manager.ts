@@ -5,8 +5,7 @@ import { getProductInventory, parseInventoryTable } from "./scraping/scraper";
 /**
  * Retrieve user info from Dynamo
  */
-export const retrieveUserInfo = async () => {
-  const username = "Les";
+export const retrieveUserInfo = async (username: string) => {
   const dynamoRecord = await getUserRecord(username);
   if (!getUserRecord) {
     throw new Error(`User not found with username: ${username}`);
@@ -28,7 +27,7 @@ export const retrieveProductInfo = async (username: string) => {
 export const retrieveProductInventory = async (
   type: string,
   name: string,
-  size: string
+  size?: string
 ) => {
   const table = await getProductInventory(type, name, size);
   if (!table) return;
