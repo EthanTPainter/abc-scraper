@@ -9,5 +9,5 @@ FROM public.ecr.aws/lambda/nodejs:16-x86_64
 WORKDIR ${LAMBDA_TASK_ROOT}
 COPY package.json ./
 RUN npm install --production
-COPY --from=builder /usr/app/dist/* ./
+COPY --from=builder /usr/app/dist/ ./
 CMD ["app.handler"]
