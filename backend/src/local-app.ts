@@ -1,7 +1,6 @@
 import { retrieveProductInventory } from "./manager";
 import {
   closeBrowser,
-  getProductInventory,
   loadBaseUrl,
   setStoreLocation,
 } from "./scraping/scraper";
@@ -14,23 +13,25 @@ export const handler = async () => {
   // Local product list
   const products = [
     {
-      productType: "bourbon",
-      productName: "buffalo-trace-bourbon",
-      productSize: "750",
+      Username: "Les_Product",
+      ProductName: "buffalo-trace-bourbon",
+      ProductType: "bourbon",
+      ProductTitle: "Buffalo Trace Bourbon",
+      ProductSize: "750",
     },
   ];
 
   const allProductInventories = [];
   for (const product of products) {
     const productInventory = await retrieveProductInventory(
-      product.productName,
-      product.productType,
-      product.productSize
+      product.ProductName,
+      product.ProductType,
+      product.ProductSize
     );
     if (!productInventory) continue;
 
     const foundInventory = {
-      [`${product.productType}_${product.productName}_${product.productSize}`]: productInventory
+      [product.ProductTitle]: productInventory,
     };
     allProductInventories.push(foundInventory);
   }
