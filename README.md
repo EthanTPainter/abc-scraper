@@ -38,9 +38,9 @@ To run: `./shell-scripts/aws_run.sh`
 
 ### Deploying backend
 
-First, install AWS SAM CLI.
+First, install [AWS SAM CLI](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html).
 
-Then within the backend folder, use the script `./shell-scripts/deploy_to_aws.sh`. This will handle the ECR deploy for the generated docker image, the scraper lambda, and all other resources (dynamoDB, SNS, etc.).
+Then within the backend folder, update the script `./shell-scripts/deploy_to_aws.sh` to change `S3_BUCKET`, `SCRAPER_USERNAME`, and `SCRAPER_PHONE_NUMBER` to use your own S3 Bucket name, User to scrape info about, and the user's phone number to receive alerts via SMS. This script will handle the ECR deploy for the generated docker image, the scraper lambda, and all other resources (dynamoDB, SNS, etc.).
 
 ### Local Debugging
 
@@ -54,19 +54,19 @@ const test = async () => {
   await setStoreLocation();
 
   // Rare Item
-  const table = await getProductInventory("bourbon", "buffalo-trace-bourbon", "750");
+  // const table = await getProductInventory("bourbon", "buffalo-trace-bourbon", "750");
 
   // Common Item
-  // const table = await getProductInventory(
-  //   "bourbon",
-  //   "buffalo-trace-bourbon-cream-liqueur",
-  //   "750"
-  // );
+  const table = await getProductInventory(
+    "bourbon",
+    "buffalo-trace-bourbon-cream-liqueur",
+    "750"
+  );
 
   if (!table) {
     await closeBrowser();
     return;
-  };
+  }
   const response = await parseInventoryTable(table);
   console.log(`RESPONSE: `, response);
   await closeBrowser();
