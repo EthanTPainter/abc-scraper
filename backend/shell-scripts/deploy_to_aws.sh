@@ -12,8 +12,10 @@ echo "Using account id ${ACCOUNT_ID}"
 IMAGE_URI="${ACCOUNT_ID}.dkr.ecr.${REGION}.amazonaws.com/${IMAGE_NAME}:$(date +%s)"
 echo "Created Image URI ${IMAGE_URI}"
 
-# Provide existing S3 bucket
+# Provide existing S3 bucket name and SCRAPER user related info for environment variables
 S3_BUCKET=ethan-painter-artifacts
+SCRAPER_USERNAME="USER"
+SCRAPER_PHONE_NUMBER="PHONE NUMBER"
 
 # Create new ECR repository, tag the local image, and push it to ECR
 aws ecr create-repository --repository-name ${IMAGE_NAME} --region "${REGION}" || true
@@ -25,7 +27,6 @@ docker push "${IMAGE_URI}"
 STACK_NAME="ABC-Scraper-Stack"
 
 # Deploy with SAM with the Image URI
-SCRAPER_USERNAME="Les"
 sam deploy cloudformation --stack-name ${STACK_NAME} -t template.yaml --region "${REGION}" \
-  --parameter-overrides ImageUriParameter="${IMAGE_URI}" ScraperUsername="${SCRAPER_USERNAME}" \
+  --parameter-overrides ImageUriParameter="${IMAGE_URI}" ScraperUsername="${SCRAPER_USERNAME}" ScraperUserPhoneNumber="${SCRAPER_PHONE_NUMBER}" \
   --image-repository ${IMAGE_URI} --capabilities CAPABILITY_IAM
