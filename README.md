@@ -64,12 +64,12 @@ const test = async () => {
   );
 
   if (!table) {
-    await closeBrowser();
+    await closePuppeteer();
     return;
   }
   const response = await parseInventoryTable(table);
   console.log(`RESPONSE: `, response);
-  await closeBrowser();
+  await closePuppeteer();
 };
 test();
 ```

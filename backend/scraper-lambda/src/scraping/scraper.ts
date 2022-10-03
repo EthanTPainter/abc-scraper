@@ -1,4 +1,4 @@
-const chromium = require("chrome-aws-lambda");
+const chromium = require('chrome-aws-lambda');
 const { addExtra } = require("puppeteer-extra");
 const stealthPlugin = require("puppeteer-extra-plugin-stealth");
 const adBlockerPlugin = require("puppeteer-extra-plugin-adblocker");
@@ -10,8 +10,8 @@ puppeteerExtra.use(adBlockerPlugin());
 
 const baseUrl = "https://www.abc.virginia.gov";
 
-let browser: any; // type ofPpuppeteer.Browser
-let page: any; // puppeteer.Page;
+let browser: any = null; // type ofPpuppeteer.Browser
+let page: any = null; // puppeteer.Page;
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -23,15 +23,16 @@ const INVENTORY_TABLE_ID = "no-more-tables";
 export const loadBaseUrl = async () => {
   console.log(`Launching Headless Browser...`);
   browser = await puppeteerExtra.launch({
-    defaultViewport: chromium.defaultViewport,
-    headless: true,
-    executablePath: await chromium.executablePath,
     args: chromium.args,
+    defaultViewport: chromium.defaultViewport,
+    executablePath: await chromium.executablePath,
+    headless: false,
+    ignoreHTTPSErrors: true
   });
   console.log(`Creating new browser page...`);
   page = await browser.newPage();
   await page.goto(baseUrl, {
-    waitUntil: ["domcontentloaded", "networkidle2"],
+    waitUntil: ["domcontentloaded"],
   });
 };
 
@@ -69,7 +70,6 @@ export const getProductInventory = async (
   await page.goto(productUrl, {
     waitUntil: ["domcontentloaded"],
   });
-  await delay(5000);
 
   // Select product size
   if (productSize) {

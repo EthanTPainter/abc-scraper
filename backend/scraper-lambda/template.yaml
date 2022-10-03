@@ -68,7 +68,7 @@ Resources:
       PackageType: Image
       ImageUri: !Ref ImageUriParameter
       Timeout: 60
-      MemorySize: 3000
+      MemorySize: 1024
       Architectures:
         - x86_64
       Tags:

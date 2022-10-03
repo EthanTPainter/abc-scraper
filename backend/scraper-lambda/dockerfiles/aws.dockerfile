@@ -8,6 +8,6 @@ RUN npm run build
 FROM public.ecr.aws/lambda/nodejs:16-x86_64
 WORKDIR ${LAMBDA_TASK_ROOT}
 COPY package.json ./
-RUN npm install --omit=dev --no-bin-links
+RUN npm install --omit=dev
 COPY --from=builder /usr/app/dist/ ./
 CMD ["app.handler"]

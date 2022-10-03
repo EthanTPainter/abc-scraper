@@ -1,10 +1,4 @@
-import {
-  canSendAlert,
-  createSmsTextMessage,
-  retrieveProductInfo,
-  retrieveProductInventory,
-  updateRecordWithTime,
-} from "./manager";
+import { retrieveProductInventory } from "./manager";
 import {
   closePuppeteer,
   loadBaseUrl,
@@ -16,29 +10,43 @@ import {
 export const handler = async () => {
   await loadBaseUrl();
   await setStoreLocation();
-  // Local product list
+
+  // Rare product
+  // const products = [
+  //   {
+  //     Username: "Les_Product",
+  //     ProductName: "buffalo-trace-bourbon-750",
+  //     ProductUrlName: "buffalo-trace-bourbon",
+  //     ProductType: "bourbon",
+  //     ProductTitle: "Buffalo Trace Bourbon",
+  //     ProductSize: "750",
+  //   },
+  // ];
+
+  // Not Rare Product
   const products = [
     {
       Username: "Les_Product",
-      ProductName: "buffalo-trace-bourbon-750",
-      ProductUrlName: "buffalo-trace-bourbon",
+      ProductName: "buffalo-trace-bourbon-cream-liqueur-750",
+      ProductUrlName: "buffalo-trace-bourbon-cream-liqueur",
       ProductType: "bourbon",
-      ProductTitle: "Buffalo Trace Bourbon",
+      ProductTitle: "Buffalo Trace Bourbon Cream Liqueur",
       ProductSize: "750",
     },
   ];
 
   const allProductInventories = [];
   for (const product of products) {
-    const productInventory = await retrieveProductInventory(
+    const inventoryLocations = await retrieveProductInventory(
       product.ProductType,
       product.ProductUrlName,
       product.ProductSize
     );
-    if (!productInventory) continue;
+    if (!inventoryLocations) continue;
 
     const foundInventory = {
-      [product.ProductTitle]: productInventory,
+      name: product.ProductName,
+      inventory: inventoryLocations,
     };
     allProductInventories.push(foundInventory);
   }
@@ -47,3 +55,5 @@ export const handler = async () => {
   await closePuppeteer();
   return "Handler Completed Successfully";
 };
+
+// handler();

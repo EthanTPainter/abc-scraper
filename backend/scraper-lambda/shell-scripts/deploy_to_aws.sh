@@ -14,8 +14,8 @@ echo "Created Image URI ${IMAGE_URI}"
 
 # Provide existing S3 bucket name and SCRAPER user related info for environment variables
 S3_BUCKET=ethan-painter-artifacts
-SCRAPER_USERNAME="USER"
-SCRAPER_PHONE_NUMBER="PHONE NUMBER"
+SCRAPER_USERNAME="Ethan"
+SCRAPER_PHONE_NUMBER="8049385624"
 
 # Create new ECR repository, tag the local image, and push it to ECR
 aws ecr create-repository --repository-name ${IMAGE_NAME} --region "${REGION}" || true
