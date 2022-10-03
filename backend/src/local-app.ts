@@ -1,6 +1,12 @@
-import { retrieveProductInventory } from "./manager";
 import {
-  closeBrowser,
+  canSendAlert,
+  createSmsTextMessage,
+  retrieveProductInfo,
+  retrieveProductInventory,
+  updateRecordWithTime,
+} from "./manager";
+import {
+  closePuppeteer,
   loadBaseUrl,
   setStoreLocation,
 } from "./scraping/scraper";
@@ -32,14 +38,12 @@ export const handler = async () => {
     if (!productInventory) continue;
 
     const foundInventory = {
-      [product.ProductTitle]: productInventory
+      [product.ProductTitle]: productInventory,
     };
     allProductInventories.push(foundInventory);
   }
 
-  if (allProductInventories.length > 0) {
-    console.log(`All Product Inventories`, allProductInventories);
-  }
-  await closeBrowser();
+  console.log(`All Product Inventories`, allProductInventories);
+  await closePuppeteer();
   return "Handler Completed Successfully";
 };
