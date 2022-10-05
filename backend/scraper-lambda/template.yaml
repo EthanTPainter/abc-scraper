@@ -67,8 +67,8 @@ Resources:
       Description: Scheduled scraper lambda for VA ABC products
       PackageType: Image
       ImageUri: !Ref ImageUriParameter
-      Timeout: 60
-      MemorySize: 1024
+      Timeout: 300
+      MemorySize: 2048
       Architectures:
         - x86_64
       Tags:
