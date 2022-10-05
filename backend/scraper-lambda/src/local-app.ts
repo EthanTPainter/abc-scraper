@@ -8,8 +8,13 @@ import {
 // Local App Handler for validating the scraping functionality
 // Test the retrieval of an item
 export const handler = async () => {
-  await loadBaseUrl();
-  await setStoreLocation();
+  try {
+    await loadBaseUrl();
+    await setStoreLocation();  
+  } catch (error) {
+    console.log(`PUPPETEER ERROR: `, error);
+    return;
+  }
 
   // Rare product
   // const products = [

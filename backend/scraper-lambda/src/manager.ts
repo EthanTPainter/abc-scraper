@@ -33,9 +33,11 @@ export const retrieveProductInventory = async (
   name: string,
   size?: string
 ) => {
+  console.log(`Getting product inventory`);
   const table = await getProductInventory(type, name, size);
   if (!table) return;
 
+  console.log(`Parsing inventory table`);
   const response = await parseInventoryTable(table);
   if (response.length === 0) {
     console.log(`No inventory found for ${type} ${name} with size ${size}`);
