@@ -1,1 +1,1 @@
-docker build -f dockerfiles/aws.dockerfile -t lambda-aws .
+docker build -f dockerfiles/aws.dockerfile --platform linux/amd64 -t lambda-aws .
