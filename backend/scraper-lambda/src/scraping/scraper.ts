@@ -1,12 +1,11 @@
-const chromium = require('chrome-aws-lambda');
+const chromium = require("@sparticuz/chrome-aws-lambda");
 const { addExtra } = require("puppeteer-extra");
 const stealthPlugin = require("puppeteer-extra-plugin-stealth");
 const adBlockerPlugin = require("puppeteer-extra-plugin-adblocker");
 
 // Add plugins here for stealth and ad block
 const puppeteerExtra = addExtra(chromium.puppeteer);
-puppeteerExtra.use(stealthPlugin());
-puppeteerExtra.use(adBlockerPlugin());
+puppeteerExtra.use(stealthPlugin()).use(adBlockerPlugin());
 
 const baseUrl = "https://www.abc.virginia.gov";
 
@@ -23,20 +22,36 @@ const INVENTORY_TABLE_ID = "no-more-tables";
 export const loadBaseUrl = async () => {
   console.log(`Launching Headless Browser...`);
   browser = await puppeteerExtra.launch({
-    args: chromium.args,
+    args: [
+      ...chromium.args,
+      "--disable-background-timer-throttling",
+      "--disable-gpu",
+      "--disable-dev-shm-usage",
+      "--disable-extensions",
+      "--disable-features=TranslateUI,BlinkGenPropertyTrees",
+      "--disable-accelerated-2d-canvas",
+      "--disable-ipc-flooding-protection",
+      "--disable-renderer-backgrounding",
+      "--enable-features=NetworkService,NetworkServiceInProcess",
+      "--no-first-run",
+    ],
     defaultViewport: chromium.defaultViewport,
     executablePath: await chromium.executablePath,
-    headless: false,
-    ignoreHTTPSErrors: true
+    headless: chromium.headless,
+    ignoreHTTPSErrors: true,
   });
   console.log(`Creating new browser page...`);
   page = await browser.newPage();
+
+  console.log(`Going to Base URL: `, baseUrl);
   await page.goto(baseUrl, {
     waitUntil: ["domcontentloaded"],
   });
+  console.log(`Visited the base url: `, baseUrl);
 };
 
 export const setStoreLocation = async () => {
+  console.log(`Setting the store location`);
   // Hardcoded Location for now
   const zipCode = "23114";
 
@@ -44,6 +59,7 @@ export const setStoreLocation = async () => {
   await page.click("#my-store");
   await delay(1000);
 
+  console.log(`Typing zipcode into search bar`);
   // Type zip code into store search bar
   await page.type(
     "input[placeholder='Search by City, Zip, or Store #']",
@@ -51,11 +67,13 @@ export const setStoreLocation = async () => {
   );
   await delay(1000);
 
-  // Click Searh button
+  // Click Search button
+  console.log(`Clicking the search button`);
   await page.click("a[aria-label='Search']");
   await delay(1000);
 
   // Select store
+  console.log(`Select store`);
   await page.click("#store-search-make-this-my-store-284-modal");
   await delay(500);
 };
