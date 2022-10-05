@@ -1,10 +1,16 @@
-import chromium from "chrome-aws-lambda";
-const puppeteer = chromium.puppeteer;
+const chromium = require("@sparticuz/chrome-aws-lambda");
+const { addExtra } = require("puppeteer-extra");
+const stealthPlugin = require("puppeteer-extra-plugin-stealth");
+const adBlockerPlugin = require("puppeteer-extra-plugin-adblocker");
+
+// Add plugins here for stealth and ad block
+const puppeteerExtra = addExtra(chromium.puppeteer);
+puppeteerExtra.use(stealthPlugin()).use(adBlockerPlugin());
 
 const baseUrl = "https://www.abc.virginia.gov";
 
-let browser: any; // type ofPpuppeteer.Browser
-let page: any; // puppeteer.Page;
+let browser: any = null; // type ofPpuppeteer.Browser
+let page: any = null; // puppeteer.Page;
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
@@ -14,19 +20,38 @@ const NO_INVENTORY_TEXT = "In-store purchase only";
 const INVENTORY_TABLE_ID = "no-more-tables";
 
 export const loadBaseUrl = async () => {
-  browser = await puppeteer.launch({
+  console.log(`Launching Headless Browser...`);
+  browser = await puppeteerExtra.launch({
+    args: [
+      ...chromium.args,
+      "--disable-background-timer-throttling",
+      "--disable-gpu",
+      "--disable-dev-shm-usage",
+      "--disable-extensions",
+      "--disable-features=TranslateUI,BlinkGenPropertyTrees",
+      "--disable-accelerated-2d-canvas",
+      "--disable-ipc-flooding-protection",
+      "--disable-renderer-backgrounding",
+      "--enable-features=NetworkService,NetworkServiceInProcess",
+      "--no-first-run",
+    ],
     defaultViewport: chromium.defaultViewport,
-    headless: true,
     executablePath: await chromium.executablePath,
-    args: chromium.args,
+    headless: chromium.headless,
+    ignoreHTTPSErrors: true,
   });
+  console.log(`Creating new browser page...`);
   page = await browser.newPage();
+
+  console.log(`Going to Base URL: `, baseUrl);
   await page.goto(baseUrl, {
     waitUntil: ["domcontentloaded"],
   });
+  console.log(`Visited the base url: `, baseUrl);
 };
 
 export const setStoreLocation = async () => {
+  console.log(`Setting the store location`);
   // Hardcoded Location for now
   const zipCode = "23114";
 
@@ -34,6 +59,7 @@ export const setStoreLocation = async () => {
   await page.click("#my-store");
   await delay(1000);
 
+  console.log(`Typing zipcode into search bar`);
   // Type zip code into store search bar
   await page.type(
     "input[placeholder='Search by City, Zip, or Store #']",
@@ -41,11 +67,13 @@ export const setStoreLocation = async () => {
   );
   await delay(1000);
 
-  // Click Searh button
+  // Click Search button
+  console.log(`Clicking the search button`);
   await page.click("a[aria-label='Search']");
   await delay(1000);
 
   // Select store
+  console.log(`Select store`);
   await page.click("#store-search-make-this-my-store-284-modal");
   await delay(500);
 };
@@ -60,7 +88,6 @@ export const getProductInventory = async (
   await page.goto(productUrl, {
     waitUntil: ["domcontentloaded"],
   });
-  await delay(5000);
 
   // Select product size
   if (productSize) {
@@ -76,7 +103,10 @@ export const getProductInventory = async (
   }
 
   // Get first div text to check for no inventory text
-  const firstDivText = await inventory.$eval("div", (el: HTMLDivElement) => el.innerHTML);
+  const firstDivText = await inventory.$eval(
+    "div",
+    (el: HTMLDivElement) => el.innerHTML
+  );
   if (firstDivText.includes(NO_INVENTORY_TEXT)) {
     console.log(
       `No Inventory found for ${productType} with name ${productName} (with size ${productSize})`
@@ -92,7 +122,10 @@ export const parseInventoryTable = async (
 ) => {
   // Get first div id to validate inventory table is present
   // If it is, Check inventory of the home store
-  const firstDivId = await inventory.$eval("div", (el: HTMLDivElement) => el.id);
+  const firstDivId = await inventory.$eval(
+    "div",
+    (el: HTMLDivElement) => el.id
+  );
   if (firstDivId !== INVENTORY_TABLE_ID) return [];
 
   const table = await inventory.$("table");
@@ -100,9 +133,9 @@ export const parseInventoryTable = async (
     console.log(`Could not find a table element within the inventory`);
     return [];
   }
-
-  const tableHeaders = await table.$$eval("thead > tr > th", (nodes: Element[]) =>
-    nodes.map((node: Element) => node.innerHTML)
+  const tableHeaders = await table.$$eval(
+    "thead > tr > th",
+    (nodes: Element[]) => nodes.map((node: Element) => node.innerHTML)
   );
   const headerIndex = tableHeaders.indexOf("Inventory");
   if (!headerIndex) {
@@ -111,6 +144,12 @@ export const parseInventoryTable = async (
     );
     return [];
   }
+
+  const testInventory = await table.$eval(
+    `tbody`,
+    (el: Element) => el.innerHTML
+  );
+  console.log(`TEST INVENTORY: `, testInventory);
   const myStoreInventory = await table.$eval(
     `tbody > tr > td:nth-child(${headerIndex + 1})`,
     (el: Element) => el.innerHTML
@@ -130,7 +169,7 @@ export const parseInventoryTable = async (
     `a[class='more-stores'] > div`
   );
   if (!findAtOtherStoresButton) {
-    console.log(`Did not find the find other stores button`); 
+    console.log(`Did not find the find other stores button`);
     return [];
   }
   await findAtOtherStoresButton.click();
@@ -152,9 +191,13 @@ export const parseInventoryTable = async (
       (el: Element) => el.innerHTML
     );
     // SECOND = MILES
-    const miles = await storeSections[1].evaluate((el: HTMLTableCellElement) => el.innerHTML);
+    const miles = await storeSections[1].evaluate(
+      (el: HTMLTableCellElement) => el.innerHTML
+    );
     // THIRD = INVENTORY
-    const inventory = await storeSections[2].evaluate((el: HTMLTableCellElement) => el.innerHTML);
+    const inventory = await storeSections[2].evaluate(
+      (el: HTMLTableCellElement) => el.innerHTML
+    );
 
     if (parseInt(inventory) > 0) {
       storesWithInventory.push({
@@ -168,6 +211,8 @@ export const parseInventoryTable = async (
   return storesWithInventory;
 };
 
-export const closeBrowser = async () => {
+export const closePuppeteer = async () => {
+  console.log(`Closing Page and Browser`);
+  await page.close();
   await browser.close();
 };

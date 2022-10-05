@@ -17,12 +17,18 @@ Parameters:
   ScraperUsername:
     Type: String
     Description: The username the scraper lambda will use to check for product inventory
+  ScraperUserPhoneNumber:
+    Type: String
+    Description: Phone Number for the user to contact about inventory updates
 
 Resources:
   NotificationSNS:
     Type: AWS::SNS::Topic
     Properties:
       TopicName: !Ref TopicName
+      Subscription:
+        - Endpoint: !Ref ScraperUserPhoneNumber
+          Protocol: sms
       Tags:
         - Key: Product
           Value: ABC-Scraper
@@ -61,8 +67,8 @@ Resources:
       Description: Scheduled scraper lambda for VA ABC products
       PackageType: Image
       ImageUri: !Ref ImageUriParameter
-      Timeout: 600
-      MemorySize: 1024
+      Timeout: 300
+      MemorySize: 2048
       Architectures:
         - x86_64
       Tags:
@@ -70,6 +76,7 @@ Resources:
       Environment:
         Variables:
           User: !Ref ScraperUsername
+          PhoneNumber: !Ref ScraperUserPhoneNumber
       Policies:
         Statement:
           - Effect: Allow
