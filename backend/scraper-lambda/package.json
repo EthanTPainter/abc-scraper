@@ -13,8 +13,8 @@
     "@aws-sdk/client-dynamodb": "^3.181.0",
     "@aws-sdk/client-sns": "^3.181.0",
     "@aws-sdk/lib-dynamodb": "^3.181.0",
-    "@sparticuz/chrome-aws-lambda": "^17.1.3",
-    "puppeteer": "^17.1.0",
+    "@sparticuz/chromium": "^109.0.0",
+    "puppeteer-core": "^19.4.0",
     "puppeteer-extra": "^3.3.4",
     "puppeteer-extra-plugin-adblocker": "^2.13.5",
     "puppeteer-extra-plugin-stealth": "^2.11.1"
