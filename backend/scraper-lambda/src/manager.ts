@@ -33,7 +33,7 @@ export const retrieveProductInventory = async (
   name: string,
   size?: string
 ) => {
-  console.log(`Getting product inventory`);
+  console.log(`Getting product inventory for ${name}`);
   const table = await getProductInventory(type, name, size);
   if (!table) return;
 
