@@ -83,10 +83,10 @@ export const handler = async () => {
   }
 
   // Send notifications for each SMS message
-  for (const text of smsTexts) {
-    console.log(`SMS Text Message: `, text);
-    await sendNotification(text, phoneNumber);
-  }
+  // for (const text of smsTexts) {
+  //   console.log(`SMS Text Message: `, text);
+  //   await sendNotification(text, phoneNumber);
+  // }
 
   return "Handler Completed Successfully";
 };
