@@ -68,7 +68,7 @@ Resources:
       PackageType: Image
       ImageUri: !Ref ImageUriParameter
       Timeout: 300
-      MemorySize: 2048
+      MemorySize: 1024
       Architectures:
         - x86_64
       Tags:
@@ -84,8 +84,6 @@ Resources:
               - dynamodb:GetItem
               - dynamodb:GetRecords
               - dynamodb:Query
-              - dynamodb:PartiQLInsert
-              - dynamodb:PartiQLUpdate
               - dynamodb:UpdateItem
               - dynamodb:DeleteItem
               - dynamodb:PutItem

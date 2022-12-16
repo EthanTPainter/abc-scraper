@@ -1,4 +1,4 @@
-const chromium = require("@sparticuz/chrome-aws-lambda");
+const chromium = require("@sparticuz/chromium");
 const { addExtra } = require("puppeteer-extra");
 const stealthPlugin = require("puppeteer-extra-plugin-stealth");
 const adBlockerPlugin = require("puppeteer-extra-plugin-adblocker");
@@ -14,27 +14,22 @@ let page: any = null; // puppeteer.Page;
 
 const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
 
+// Default Store Location
+// Should match provided store info on website
+// May want to change to a variable to make it more dynamic
+// or get from the user record
 const DEFAULT_MY_STORE =
   "148 Charter Colony Parkway Midlothian, VA 23114 (#248)";
+
+// Consistent text expected on the website
 const NO_INVENTORY_TEXT = "In-store purchase only";
 const INVENTORY_TABLE_ID = "no-more-tables";
 
 export const loadBaseUrl = async () => {
   console.log(`Launching Headless Browser...`);
+  // browser = await puppeteerExtra.launch({
   browser = await puppeteerExtra.launch({
-    args: [
-      ...chromium.args,
-      "--disable-background-timer-throttling",
-      "--disable-gpu",
-      "--disable-dev-shm-usage",
-      "--disable-extensions",
-      "--disable-features=TranslateUI,BlinkGenPropertyTrees",
-      "--disable-accelerated-2d-canvas",
-      "--disable-ipc-flooding-protection",
-      "--disable-renderer-backgrounding",
-      "--enable-features=NetworkService,NetworkServiceInProcess",
-      "--no-first-run",
-    ],
+    args: chromium.args,
     defaultViewport: chromium.defaultViewport,
     executablePath: await chromium.executablePath,
     headless: chromium.headless,
@@ -59,7 +54,6 @@ export const setStoreLocation = async () => {
   await page.click("#my-store");
   await delay(1000);
 
-  console.log(`Typing zipcode into search bar`);
   // Type zip code into store search bar
   await page.type(
     "input[placeholder='Search by City, Zip, or Store #']",
@@ -68,12 +62,10 @@ export const setStoreLocation = async () => {
   await delay(1000);
 
   // Click Search button
-  console.log(`Clicking the search button`);
   await page.click("a[aria-label='Search']");
   await delay(1000);
 
   // Select store
-  console.log(`Select store`);
   await page.click("#store-search-make-this-my-store-284-modal");
   await delay(500);
 };
@@ -213,6 +205,6 @@ export const parseInventoryTable = async (
 
 export const closePuppeteer = async () => {
   console.log(`Closing Page and Browser`);
-  await page.close();
-  await browser.close();
+  if (page) await page.close();
+  if (browser) await browser.close();
 };
